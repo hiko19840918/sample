@@ -1,0 +1,68 @@
+Sub create_header()
+
+    Dim ws As Worksheet
+    Dim isTempSheet As Boolean
+    Dim nws As Worksheet
+    Dim tempFileName As String: tempFileName = "tmp"
+
+    Dim model As Variant
+    Dim model_s_rng As Range
+    Dim model_e_rng As Range
+
+    Dim ki As Variant
+    Dim ki_s_rng As Range
+    Dim ki_e_rng As Range
+
+    Set model_s_rng = Cells.Find(What:="vba_p_m_start", LookIn:=xlValues, Lookat:=xlWhole)
+    Set model_e_rng = Cells.Find(What:="vba_p_m_end", LookIn:=xlValues, Lookat:=xlWhole)
+    Set ki_s_rng = Cells.Find(What:="vba_p_k_start", LookIn:=xlValues, Lookat:=xlWhole)
+    Set ki_e_rng = Cells.Find(What:="vba_p_k_end", LookIn:=xlValues, Lookat:=xlWhole)
+
+    Set model = Range(model_s_rng, model_e_rng)
+    Set ki = Range(ki_s_rng, ki_e_rng)
+
+    For Each ws In Worksheets
+        If ws.Name = tempFileName Then isTempSheet = True
+    Next ws
+    If isTempSheet = True Then
+        delete_work_sheet tempFileName
+    End If
+
+    Set nws = Sheets.Add(After:=Sheets(Sheets.Count))
+    nws.Name = "" & tempFileName
+
+    make_file tempFileName
+
+End Sub
+
+Sub delete_work_sheet(ByVal sheetName As String)
+
+    Application.DisplayAlerts = False
+    Worksheets(sheetName).Delete
+    Application.DisplayAlerts = True
+
+End Sub
+
+Sub make_file(ByVal sheetName As String)
+
+    Dim outputFileName As String: outputFileName = "XX.h"
+    Dim ws As Worksheet
+    Set ws = Worksheets(sheetName)
+    Dim datFile As String
+    datFile = ActiveWorkbook.Path & outputFileName
+ 
+    Open datFile For Output As #1
+ 
+    Dim i As Long
+    i = 1
+    Do While ws.Cells(i, 1).Value <> ""
+        Print #1, ws.Cells(i, 1).Value
+        i = i + 1
+    Loop
+ 
+    Close #1
+ 
+    MsgBox "処理が完了しました。"
+ 
+End Sub
+
